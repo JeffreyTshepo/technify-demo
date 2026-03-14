@@ -1,0 +1,152 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Technify{% endblock %}
+
+{% block content %}
+<div class="product-details-section">
+
+    <!-- Back Button -->
+    <a href="{% url 'shop:index' %}" class="back-link">
+        ← Back to Products
+    </a>
+
+    <div class="product-details-grid">
+
+        <!-- Image Section -->
+        <div class="product-gallery">
+            <div class="main-image-container">
+                {% if product.image1 %}
+                <img id="mainImage" src="{{ product.image1.url }}" alt="{{ product.name }}" class="main-image">
+                {% else %}
+                <div style="width: 100%; height: 500px; background: #e5e7eb; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 80px;">📦</div>
+                {% endif %}
+            </div>
+
+            <!-- Thumbnails -->
+            <div class="thumbnails">
+                {% if product.image1 %}
+                <img src="{{ product.image1.url }}" onclick="changeImage('{{ product.image1.url }}')" class="thumbnail active">
+                {% endif %}
+                {% if product.image2 %}
+                <img src="{{ product.image2.url }}" onclick="changeImage('{{ product.image2.url }}')" class="thumbnail">
+                {% endif %}
+                {% if product.image3 %}
+                <img src="{{ product.image3.url }}" onclick="changeImage('{{ product.image3.url }}')" class="thumbnail">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-info">
+            <p class="product-category">
+                {{ product.category.name }}
+            </p>
+
+            <h1 class="product-name">
+                {{ product.name }}
+            </h1>
+
+            <h2 class="product-price">
+                R {{ product.price }}
+            </h2>
+
+            {% if product.description %}
+            <div class="product-description">
+                <h3>Description</h3>
+                <p>{{ product.description }}</p>
+            </div>
+            {% endif %}
+
+            {% if product.get_features_list %}
+            <div class="product-features">
+                <h3>Key Features</h3>
+                <ul>
+                    {% for feature in product.get_features_list %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if product.in_stock %}
+            <!-- Quantity Selector -->
+            <div class="quantity-selector">
+                <label>Quantity:</label>
+                <div class="quantity-controls">
+                    <button onclick="decreaseQty()" class="qty-btn">−</button>
+                    <input type="number" id="qtyInput" value="1" min="1" max="10" readonly>
+                    <button onclick="increaseQty()" class="qty-btn">+</button>
+                </div>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <button onclick="addToCartFromDetail()" class="add-to-cart-btn">
+                🛒 Add to Cart
+            </button>
+            {% else %}
+            <div style="padding: 20px; background: #ef4444; color: white; border-radius: 12px; text-align: center; margin: 20px 0;">
+                <p style="margin: 0; font-weight: 600;">Out of Stock</p>
+            </div>
+            {% endif %}
+
+            <!-- Trust Badges -->
+            <div class="trust-badges">
+                <div class="badge">
+                    <span class="badge-icon">🚚</span>
+                    <span>Delivery</span>
+                </div>
+                <div class="badge">
+                    <span class="badge-icon">🔒</span>
+                    <span>Secure Payment</span>
+                </div>
+                <div class="badge">
+                    <span class="badge-icon">↩️</span>
+                    <span>Easy Returns</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function changeImage(src) {
+    document.getElementById('mainImage').src = src;
+}
+
+function decreaseQty() {
+    const input = document.getElementById('qtyInput');
+    if (input.value > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+
+function increaseQty() {
+    const input = document.getElementById('qtyInput');
+    if (input.value < 10) {
+        input.value = parseInt(input.value) + 1;
+    }
+}
+
+function addToCartFromDetail() {
+    const qty = document.getElementById('qtyInput').value;
+    const productId = {{ product.id }};
+
+    fetch(`/add-to-cart/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `quantity=${qty}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('cartCount').textContent = data.cart_count;
+            alert(data.message);
+        }
+    });
+}
+</script>
+{% endblock %}

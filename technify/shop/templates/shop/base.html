@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="description" content="Technify - Quality home appliances and gaming products at affordable prices">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>{% block title %}Technify{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="{{ store_mode }}">
+
+    <!-- Top Bar with Store Switcher -->
+    <header class="top-bar">
+        <div class="container">
+            <div class="top-bar-content">
+                <span class="delivery-info">Free delivery on orders over R500</span>
+                <div class="top-bar-actions">
+                    <div class="mode-toggle">
+                        <button class="mode-btn {% if store_mode == 'electronics' %}active{% endif %}" data-mode="electronics">
+                            <span class="icon">🏠</span>
+                            <span class="mode-text">Electronics</span>
+                        </button>
+                        <button class="mode-btn {% if store_mode == 'gaming' %}active{% endif %}" data-mode="gaming">
+                            <span class="icon">🎮</span>
+                            <span class="mode-text">Gaming</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <div class="nav-content">
+                <!-- Logo -->
+                <a href="{% url 'shop:index' %}" class="logo">
+                    <img src="{% static 'images/technify-logo.png' %}" alt="Technify" class="logo-image">
+                </a>
+
+                <!-- Cart Link - Absolute positioned on mobile -->
+                <a href="{% url 'shop:cart' %}" class="cart-link">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-badge" id="cartCount">{{ cart_count }}</span>
+                </a>
+
+                <!-- Nav Tools (Auth + Search) -->
+                <div class="nav-tools">
+                    <!-- Auth Buttons -->
+                    <div class="mobile-auth-buttons">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'shop:my_account' %}" class="auth-btn account-btn">
+                            <span class="auth-icon">👤</span>
+                            <span class="auth-text">{{ user.first_name|truncatechars:8 }}</span>
+                        </a>
+                        <a href="{% url 'shop:logout' %}" class="auth-btn logout-btn">
+                            Logout
+                        </a>
+                        {% else %}
+                        <a href="{% url 'shop:login' %}" class="auth-btn login-btn">
+                            Login
+                        </a>
+                        <a href="{% url 'shop:signup' %}" class="auth-btn signup-btn">
+                            Sign Up
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="search-bar">
+                        <form method="GET" action="{% url 'shop:index' %}">
+                            <input type="text" name="q" placeholder="Search products..." value="{{ request.GET.q|default:'' }}" />
+                            <button type="submit" class="search-btn">
+                                <span class="search-icon">🔍</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Category Navigation - Block for override -->
+                {% block category_nav %}
+<style>
+/* Category Scroll Fix - Inline Style */
+@media (max-width: 768px) {
+  .category-nav-wrapper {
+    width: calc(100vw - 40px);
+    max-width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin: 0 -20px;
+    padding: 0 20px;
+  }
+
+  .category-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .category-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+
+  .category-nav-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, transparent, white);
+    pointer-events: none;
+  }
+
+  body.gaming .category-nav-wrapper::after {
+    background: linear-gradient(to right, transparent, #0a0a0a);
+  }
+}
+</style>
+{% endblock %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h3>Technify</h3>
+                    <p>{% if store_mode == 'gaming' %}Your mobile gaming upgrade hub.{% else %}Quality home appliances at affordable prices.{% endif %}</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="{% url 'shop:index' %}">Electronics</a></li>
+                        <li><a href="{% url 'shop:index' %}">Gaming</a></li>
+                        <li><a href="#">Deals</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="{% url 'shop:shipping_policy' %}">Shipping Policy</a></li>
+                        <li><a href="{% url 'shop:terms' %}">Terms & Conditions</a></li>
+                        <li><a href="{% url 'shop:returns' %}">Returns & Refunds</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Newsletter</h4>
+                    <p>Get the latest deals</p>
+                    <input type="email" placeholder="Your email" class="newsletter-input" />
+                    <button class="newsletter-btn">Subscribe</button>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Technify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CSRF Token for AJAX -->
+    <script>
+        const csrfToken = '{{ csrf_token }}';
+    </script>
+
+    <script src="{% static 'js/app.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,772 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Secure Checkout - Technify{% endblock %}
+
+{% block content %}
+<div class="checkout-section">
+    <div class="container">
+        <div class="checkout-header">
+            <h1>🛒 Secure Checkout</h1>
+            <p>Complete your order securely</p>
+        </div>
+
+        <div class="checkout-layout">
+            <!-- Checkout Form -->
+            <div class="checkout-form-section">
+                <form method="POST" id="checkoutForm">
+                    {% csrf_token %}
+                    
+                    <!-- Customer Information -->
+                    <div class="form-section">
+                        <h2>👤 Customer Information</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                {{ form.full_name }}
+                                {% if form.full_name.errors %}
+                                    <span class="error">{{ form.full_name.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <span class="error">{{ form.email.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Phone Number *</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    <span class="error">{{ form.phone.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Alternative Phone (Optional)</label>
+                                {{ form.alt_phone }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <div class="form-section">
+                        <h2>📍 Delivery Address</h2>
+                        <div class="address-tip">
+                            <span class="tip-icon">💡</span>
+                            <p><strong>Important:</strong> Please include your house/building number for accurate delivery!</p>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Street Address (Include House/Building Number) *</label>
+                            {{ form.address }}
+                            <small class="field-hint">📍 Example: 123 Main Street, House 5</small>
+                            {% if form.address.errors %}
+                                <span class="error">{{ form.address.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>Apartment, Suite, Unit, Complex Name (Optional)</label>
+                            {{ form.address2 }}
+                            <small class="field-hint">Example: Apartment 4B, Sunnypark Complex</small>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>City *</label>
+                                {{ form.city }}
+                                {% if form.city.errors %}
+                                    <span class="error">{{ form.city.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Province *</label>
+                                {{ form.province }}
+                                {% if form.province.errors %}
+                                    <span class="error">{{ form.province.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Postal Code *</label>
+                                {{ form.postal_code }}
+                                {% if form.postal_code.errors %}
+                                    <span class="error">{{ form.postal_code.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>Country</label>
+                                <input type="text" value="South Africa 🇿🇦" readonly class="readonly-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Instructions -->
+                    <div class="form-section">
+                        <h2>📝 Delivery Instructions</h2>
+                        <div class="form-group full-width">
+                            <label>Special Instructions (Optional)</label>
+                            {{ form.delivery_instructions }}
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="form-section payment-section">
+                        <h2>💳 Payment Method</h2>
+                        <div class="payment-options">
+                            {% for value, label in form.payment_method.field.choices %}
+                            <label class="payment-option {% if value == 'card' %}recommended{% endif %} {% if value != 'card' %}disabled{% endif %}">
+                                <input type="radio" name="payment_method" value="{{ value }}" 
+                                       {% if value == 'card' %}checked{% endif %}
+                                       {% if value != 'card' %}disabled{% endif %}>
+                                <div class="payment-card">
+                                    <div class="payment-header">
+                                        <span class="payment-icon">{{ label }}</span>
+                                        {% if value == 'card' %}
+                                        <span class="recommended-badge">Recommended</span>
+                                        {% else %}
+                                        <span class="coming-soon-badge">Coming Soon</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if value == 'card' %}
+                                    <p class="payment-description">Secure payment with Visa, Mastercard, Amex</p>
+                                    {% elif value == 'payfast' %}
+                                    <p class="payment-description">PayFast instant EFT & card payments</p>
+                                    {% else %}
+                                    <p class="payment-description">Direct bank transfer</p>
+                                    {% endif %}
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="payment-security">
+                            <div class="security-badge">
+                                <span>🔒</span>
+                                <div>
+                                    <strong>256-bit SSL Encryption</strong>
+                                    <p>Your payment information is secure</p>
+                                </div>
+                            </div>
+                            <div class="security-badge">
+                                <span>✅</span>
+                                <div>
+                                    <strong>PCI DSS Compliant</strong>
+                                    <p>Industry-standard security</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-order-btn" id="submitBtn">
+                        <span class="btn-icon">🔒</span>
+                        Complete Order - R {{ total }}
+                    </button>
+                    
+                    <p class="terms-text">
+                        By completing your order, you agree to our 
+                        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </p>
+                </form>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="order-summary-sidebar">
+                <h2>📦 Order Summary</h2>
+                
+                <div class="order-items">
+                    {% for item in cart_items %}
+                    <div class="summary-item">
+                        <div class="item-image">
+                            {% if item.product.image1 %}
+                            <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}">
+                            {% else %}
+                            <div class="no-image">📦</div>
+                            {% endif %}
+                        </div>
+                        <div class="item-details">
+                            <h4>{{ item.product.name }}</h4>
+                            <p>Qty: {{ item.quantity }} × R {{ item.product.price }}</p>
+                        </div>
+                        <div class="item-total">
+                            R {{ item.total }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="summary-totals">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>R {{ subtotal }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery:</span>
+                        <span>{% if delivery_fee == 0 %}<span class="free-badge">FREE</span>{% else %}R {{ delivery_fee }}{% endif %}</span>
+                    </div>
+                    {% if delivery_fee > 0 %}
+                    <div class="delivery-tip">
+                        💡 Spend R {{ 500|add:"-"|add:subtotal }} more for FREE delivery!
+                    </div>
+                    {% endif %}
+                    <div class="summary-row total-row">
+                        <span>Total:</span>
+                        <span>R {{ total }}</span>
+                    </div>
+                </div>
+
+                <div class="trust-indicators">
+                    <div class="trust-item">
+                        <span>🚚</span>
+                        <p>Fast Delivery</p>
+                    </div>
+                    <div class="trust-item">
+                        <span>↩️</span>
+                        <p>Easy Returns</p>
+                    </div>
+                    <div class="trust-item">
+                        <span>🛡️</span>
+                        <p>Secure Payment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yoco Checkout API Integration -->
+<script>
+// Add cache-busting timestamp to force new script execution
+console.log('Checkout script loaded at:', new Date().toISOString());
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('checkoutForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    console.log('Checkout form initialized');
+    
+    // Show processing state when form submits
+    form.addEventListener('submit', function(e) {
+        console.log('>>> FORM SUBMIT EVENT TRIGGERED <<<');
+        
+        // Show processing immediately
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner"></span> Processing...';
+        
+        console.log('>>> FORM WILL NOW SUBMIT TO BACKEND <<<');
+        // Let form submit naturally - Django will redirect to Yoco
+    });
+});
+</script>
+
+<style>
+.checkout-section {
+    padding: 40px 20px;
+    min-height: 80vh;
+    background: var(--bg-color);
+}
+
+.checkout-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.checkout-header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.checkout-header p {
+    font-size: 16px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: var(--product-bg);
+    border: 3px solid var(--product-border);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+}
+
+body.gaming .form-section {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+}
+
+.form-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 14px 18px;
+    border: 2px solid var(--input-border);
+    border-radius: 12px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+body.gaming .form-group input:focus,
+body.gaming .form-group select:focus,
+body.gaming .form-group textarea:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.readonly-input {
+    background: var(--product-bg) !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.error {
+    color: var(--danger-color);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.address-tip {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+body.gaming .address-tip {
+    background: rgba(34, 197, 94, 0.1);
+    border-left-color: #22c55e;
+}
+
+.tip-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.address-tip p {
+    margin: 0;
+    font-size: 14px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+body.gaming .address-tip p {
+    color: var(--text-color);
+}
+
+.field-hint {
+    display: block;
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.6;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Payment Options */
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.payment-option {
+    display: block;
+    cursor: pointer;
+}
+
+.payment-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.payment-option input[type="radio"] {
+    display: none;
+}
+
+.payment-card {
+    padding: 20px;
+    border: 3px solid var(--product-border);
+    border-radius: 16px;
+    background: var(--bg-color);
+    transition: all 0.3s ease;
+}
+
+.payment-option input:checked + .payment-card {
+    border-color: var(--primary-color);
+    background: var(--product-bg);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+body.gaming .payment-option input:checked + .payment-card {
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+.payment-option:not(.disabled):hover .payment-card {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.payment-icon {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.recommended-badge {
+    background: var(--primary-color);
+    color: var(--button-text);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.coming-soon-badge {
+    background: #f59e0b;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.payment-description {
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0;
+}
+
+.payment-security {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: 12px;
+}
+
+.security-badge {
+    display: flex;
+    gap: 12px;
+    align-items: start;
+}
+
+.security-badge span {
+    font-size: 24px;
+}
+
+.security-badge strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text-color);
+    margin-bottom: 4px;
+}
+
+.security-badge p {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin: 0;
+}
+
+/* Submit Button */
+.submit-order-btn {
+    width: 100%;
+    background: var(--primary-color);
+    color: var(--button-text);
+    padding: 20px;
+    border-radius: 50px;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 20px;
+}
+
+.submit-order-btn:hover:not(:disabled) {
+    background: var(--button-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.submit-order-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-icon {
+    font-size: 24px;
+}
+
+.spinner {
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.terms-text {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.terms-text a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* Order Summary */
+.order-summary-sidebar {
+    background: var(--product-bg);
+    border: 3px solid var(--product-border);
+    border-radius: 20px;
+    padding: 30px;
+    position: sticky;
+    top: 120px;
+    height: fit-content;
+}
+
+body.gaming .order-summary-sidebar {
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+}
+
+.order-summary-sidebar h2 {
+    font-size: 22px;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+}
+
+.order-items {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 25px;
+}
+
+.summary-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--product-border);
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-details h4 {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.item-details p {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.item-total {
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.summary-totals {
+    border-top: 2px solid var(--product-border);
+    padding-top: 20px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.summary-row.total-row {
+    border-top: 2px solid var(--product-border);
+    margin-top: 15px;
+    padding-top: 15px;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.free-badge {
+    background: var(--success-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.delivery-tip {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 15px 0;
+}
+
+body.gaming .delivery-tip {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--primary-color);
+}
+
+.trust-indicators {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid var(--product-border);
+}
+
+.trust-item {
+    text-align: center;
+}
+
+.trust-item span {
+    display: block;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.trust-item p {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .order-summary-sidebar {
+        position: relative;
+        top: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .payment-security {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

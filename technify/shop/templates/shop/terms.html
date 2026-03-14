@@ -1,0 +1,123 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Terms & Conditions - Technify{% endblock %}
+
+{% block content %}
+<div class="policy-page">
+    <div class="container">
+        <div class="policy-header">
+            <h1>📜 Terms & Conditions</h1>
+            <p class="last-updated">Last Updated: January 25, 2026</p>
+        </div>
+
+        <div class="policy-content">
+            <section class="policy-section">
+                <h2>1. Introduction</h2>
+                <p>These Terms and Conditions ("Terms") govern the use of technify.co.za ("the Website") and the purchase of any products or services offered.</p>
+                <p>By accessing, browsing, or purchasing from the Website, you ("the User" or "Customer") agree to be bound by these Terms and our Shipping Policy.</p>
+            </section>
+
+            <section class="policy-section">
+                <h2>2. Use of the Website</h2>
+                <ul>
+                    <li>The Website may only be used for lawful purposes</li>
+                    <li>You warrant that all information provided is accurate and complete</li>
+                    <li>We reserve the right to suspend access if Terms are breached</li>
+                    <li>You may not use the Website for fraudulent or abusive purposes</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>3. Products & Availability</h2>
+                <ul>
+                    <li>All products are subject to availability</li>
+                    <li>We reserve the right to discontinue any product without notice</li>
+                    <li>Product images are illustrative and may differ slightly from actual products</li>
+                    <li>Prices and specifications are subject to change</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>4. Pricing & Payment</h2>
+                <ul>
+                    <li>All prices are in South African Rand (ZAR) and include VAT</li>
+                    <li>Prices may be amended without prior notice</li>
+                    <li>Orders are processed once full payment is confirmed</li>
+                    <li>Accepted payment methods are displayed at checkout</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>5. Orders & Acceptance</h2>
+                <ul>
+                    <li>Placing an order constitutes an offer to purchase</li>
+                    <li>We reserve the right to decline any order</li>
+                    <li>Order cancellations may result in refunds as per applicable law</li>
+                    <li>You'll receive email confirmation once your order is accepted</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>6. Delivery</h2>
+                <p>Delivery and collection are governed by our <a href="{% url 'shop:shipping_policy' %}" style="color: var(--primary-color); font-weight: 600;">Shipping Policy</a>.</p>
+            </section>
+
+            <section class="policy-section">
+                <h2>7. Returns & Refunds</h2>
+                <ul>
+                    <li>Returns handled in accordance with South African consumer protection law</li>
+                    <li>Defective or incorrect goods must be reported within a reasonable time</li>
+                    <li>Items must be unused and in original packaging for returns</li>
+                    <li>Refunds processed within 14 business days</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>8. User Responsibilities</h2>
+                <p>By using Technify, you agree to:</p>
+                <ul>
+                    <li>Provide accurate personal and delivery information</li>
+                    <li>Maintain confidentiality of account details</li>
+                    <li>Ensure someone is available to receive deliveries</li>
+                    <li>Inspect goods upon delivery and report issues immediately</li>
+                    <li>Ensure product compatibility for your intended use</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>9. Our Responsibilities</h2>
+                <p>Technify undertakes to:</p>
+                <ul>
+                    <li>Ensure product information is accurate</li>
+                    <li>Process and dispatch orders within reasonable time</li>
+                    <li>Protect your personal information</li>
+                    <li>Provide customer support during business hours</li>
+                    <li>Comply with South African consumer protection laws</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>10. Limitation of Liability</h2>
+                <p>To the extent permitted by law:</p>
+                <ul>
+                    <li>Technify shall not be liable for indirect or consequential losses</li>
+                    <li>We're not liable for delays beyond our reasonable control</li>
+                    <li>Products are provided "as is" except where required by law</li>
+                </ul>
+            </section>
+
+            <section class="policy-section">
+                <h2>11. Governing Law</h2>
+                <p>These Terms are governed by the laws of the Republic of South Africa.</p>
+            </section>
+
+            <div class="contact-box">
+                <h3>📧 Questions About Our Terms?</h3>
+                <p class="contact-info"><strong>Email:</strong> support@technify.co.za</p>
+                <p>We're here to help clarify any questions you may have.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

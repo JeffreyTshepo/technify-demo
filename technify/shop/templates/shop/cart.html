@@ -1,0 +1,128 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - Technify{% endblock %}
+
+{% block content %}
+<section class="cart-section">
+    <div class="container">
+        <h1 class="page-title">Shopping Cart</h1>
+
+        <div class="cart-layout">
+            <!-- Cart Items -->
+            <div class="cart-items">
+                {% if cart_items %}
+                    {% for item in cart_items %}
+                    <div class="cart-item">
+                        <!-- Product Image -->
+                        {% if item.product.image1 %}
+                        <img class="cart-item-img" src="{{ item.product.image1.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                        <div class="cart-item-img cart-item-img--placeholder" aria-hidden="true">📦</div>
+                        {% endif %}
+
+                        <!-- Product Info -->
+                        <div class="cart-item-info">
+                            <h3>{{ item.product.name }}</h3>
+                            <p class="category">{{ item.product.category.name }}</p>
+                            <p class="price-qty">R {{ item.product.price }} x {{ item.quantity }}</p>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="cart-item-actions">
+                            <div class="qty-controls" aria-label="Quantity controls for {{ item.product.name }}">
+                                <button type="button" onclick="updateQty({{ item.product.id }}, {{ item.quantity }} - 1)" aria-label="Decrease quantity">−</button>
+                                <span class="qty-display">{{ item.quantity }}</span>
+                                <button type="button" onclick="updateQty({{ item.product.id }}, {{ item.quantity }} + 1)" aria-label="Increase quantity">+</button>
+                            </div>
+                            <button type="button" class="removeBtn" onclick="removeItem({{ item.product.id }})">Remove</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-cart">
+                        <div class="empty-icon">🛒</div>
+                        <h2>Your cart is empty</h2>
+                        <p>Add some products to get started!</p>
+                        <a class="shop-btn" href="{% url 'shop:index' %}">Start Shopping</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Cart Summary -->
+            <aside class="cart-summary" aria-label="Order summary">
+                <h2>Order Summary</h2>
+
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>R {{ subtotal }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Delivery:</span>
+                    <span>{% if delivery_fee == 0 %}FREE{% else %}R {{ delivery_fee }}{% endif %}</span>
+                </div>
+
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span>R {{ total }}</span>
+                </div>
+
+                {% if subtotal > 0 and subtotal < 500 %}
+                <p class="delivery-note">
+                    💸 Add R {{ amount_for_free_delivery }} more for free delivery!
+                </p>
+                {% elif subtotal >= 500 %}
+                <p class="delivery-note delivery-note--success">
+                    🎉 You qualify for FREE delivery!
+                </p>
+                {% endif %}
+
+                {% if cart_items %}
+                <a class="checkout-btn" href="{% url 'shop:checkout' %}">Proceed to Checkout</a>
+                {% endif %}
+
+                <a class="continue-shopping" href="{% url 'shop:index' %}">Continue Shopping</a>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<script>
+function updateQty(productId, newQty) {
+    if (newQty < 1 || newQty > 10) return;
+    
+    fetch(`/update-cart/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `quantity=${newQty}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function removeItem(productId) {
+    if (confirm('Remove this item from your cart?')) {
+        fetch(`/remove-from-cart/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

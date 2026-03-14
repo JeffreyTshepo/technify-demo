@@ -1,0 +1,13 @@
+# Secrets / environment files (repo-wide)
+.env
+.env.*
+!.env.example
+!.env.*.example
+env.txt
+
+# Common secret formats
+secrets.json
+*.pem
+*.key
+*.crt
+
