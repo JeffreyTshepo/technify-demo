@@ -20,3 +20,8 @@ This repo is configured to be safe for a public portfolio: no live keys are comm
 ## Production template
 
 Use `technify/.env.production.example` as a template and upload it to your host as `.env`. Keep payments in test mode for portfolio deployments.
+
+
+## Live working sit
+
+www.technify.co.za
